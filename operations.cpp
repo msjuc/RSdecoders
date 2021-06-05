@@ -248,14 +248,13 @@ vector<int> FORNEY(vector<int>j, vector<int> Zx) {
 	e3.~vector();
 	return E;
 }
-vector<bool> det(vector<int> *mtx) { //для матриц 2х2 в 1 итерацию. иначе - рекурсия! erc - указатель на вычеркнутый элемент
+vector<bool> det(vector<int> *mtx) { //для матриц 1х1 в 1 итерацию. иначе - рекурсия!
 	int size = mtx->size();
 	int offset;
 	vector<bool> result = A(0);
 	vector<bool> det_alcomp=A(1);
 	vector<vector<bool>>rangesum;
 	for (int eri = 0; eri < size; eri++) { //er-th row, i-th column
-		
 		if (size > 1) {
 			vector<int> *mtz = new vector<int>[size - 1]; //алгебраическое дополнение
 			for (int i = 0; i < size-1; i++) {
@@ -275,21 +274,21 @@ vector<bool> det(vector<int> *mtx) { //для матриц 2х2 в 1 итера�
 	return result;
 }
 vector<int> PGZ(vector<int> S) {
-	int i = t;
-	vector<bool> dt;
-	vector<int> Cix;
+	int i = t;		//изначально, i равно максимальному числу ошибок, которые код может исправить
+	vector<bool> dt;	//здесь будет значение определителя в двоичной форме (формирование конечного поля с p(x)=x^m+x+1 см. функция makegf
+	vector<int> Cix;	//сигма - полином локаторов ошибок
 	while (i > 0) {
-		vector<int> *mtx = new vector<int>[i];
-		for (int j = 0; j < i; j++) {
+		vector<int> *mtx = new vector<int>[i];	//матрица синдромов
+		for (int j = 0; j < i; j++) {		//заполнение...
 			mtx[j].assign(i, 0);
 			for (int k = 0; k < i; k++)
 				mtx[j][k] = S[j + k + 1];
 		}
-		dt = det(mtx);
-		if (L(dt)) {
-			Cix.assign(i+1, 0); Cix[0] = 1;
-			vector<int> *mtx1 = mtx;
-			for (int j = i; j > 0; j--) {
+		dt = det(mtx);	//высилили определитель
+		if (L(dt)) {	//если логарифм вектора определителя != 0...
+			Cix.assign(i+1, 0); Cix[0] = 1;	//строим сигму
+			vector<int> *mtx1 = mtx;	//используем для каждого монома при x^j используется dt и определитель матрицы,
+			for (int j = i; j > 0; j--) {	//(i-j)-ый столбец которого равен вектору-столбцу из правой части ключевого уравнения. 
 				for (int k = i + 1; k < 2 * i + 1; k++)mtx1[k-i-1][i - j] = S[k];
 				Cix[j] = L( pow_gf(L(dt),-1) * det(mtx1) );
 				mtx1 = mtx;
