@@ -16,17 +16,17 @@ vector<bool> *makegf (int n) {
 	}
 	return gf;
 }
-void print_vector(vector<int>v) {
+void print_vector(vector<int>v) {		//печатает вектор
 	int *p = &v[0];
 	while (p != &v.back() + 1)cout << *p++ << ",";
 }
-void print_bector(vector<bool>v) {
+void print_bector(vector<bool>v) {		//печатает двоичный вектор
 	for (int i = 0; i < v.size(); i++)cout << v[i] ? 1 : 0;
 }
-vector<bool> operator ^ (vector<bool> a, vector<bool> b) {
+vector<bool> operator ^ (vector<bool> a, vector<bool> b) {	//сложение двоичных векторов по модулю 2
 	int min;
 	vector<bool> result{};
-	if (a.size() <= b.size()) { //что я тут сделала? они же всегда равны!!!
+	if (a.size() <= b.size()) { 
 		min = a.size();
 		result = b;
 	}
@@ -40,14 +40,13 @@ vector<bool> operator ^ (vector<bool> a, vector<bool> b) {
 		i++;
 	}
 	return result;
-}; //c/\o#eHue no moqy/\10 2
-int in_GF_range(int power) {
-	///if (num > 0)	num--;		//make power
+}; 
+int in_GF_range(int power) {		//вход - степень альфа (элемента GF), не число! (прим: число = степень + 1)
 	while (power > n-1) power -= n;
 	while (power < 0)	 power += n;
 	return power;
 }
-vector<bool> operator / (vector<bool> a, vector<bool> b) {
+vector<bool> operator / (vector<bool> a, vector<bool> b) {	//деление двоичных векторов (элементов GF)
 	return A(in_GF_range(L(a) - L(b))+1);
 }
 vector<bool> operator * (vector<bool> a, vector<bool> b) {
@@ -55,15 +54,15 @@ vector<bool> operator * (vector<bool> a, vector<bool> b) {
 		return A(0);
 	return A(in_GF_range(L(a) + L(b) - 2)+1);
 }
-vector<int> cut(vector<int>a) {
+vector<int> cut(vector<int>a) {					//удаление старших нулей (нулевых коэффициентов при Х)
 	if (!a.empty()) 
 		while (!a.empty() && a.back() == 0)a.pop_back();
 	return a;
 }
-vector<int> operator + (vector<int> a, vector<int> b) {
+vector<int> operator + (vector<int> a, vector<int> b) {		//сложение полиномов (где коэффициенты - элементы GF)
 	vector<int>result{};
 	int min;
-	if (a.size() <= b.size()) {
+	if (a.size() <= b.size()) {				//количество итераций = длине минимального вектора (т.е. минимальной старшей степени)
 		min = a.size();
 		result = b;
 	}
@@ -71,11 +70,10 @@ vector<int> operator + (vector<int> a, vector<int> b) {
 		min = b.size();
 		result = a;
 	}
-	//Tenepb a.size = b.size
 	for (int i = 0; i < min; i++) result[i] = (L(A(a[i]) ^ A(b[i])));
 	return result;
 }
-vector<int> operator * (vector<int> a, vector<int> b) {
+vector<int> operator * (vector<int> a, vector<int> b) {		//перемножение полиномов
 	vector<int>result{};
 	result.assign(a.size() + b.size() - 1, 0);
 	for (int i = 0; i < a.size(); i++)
@@ -83,25 +81,25 @@ vector<int> operator * (vector<int> a, vector<int> b) {
 			result[i + j] = L((A(a[i]) * A(b[j])) ^ A(result[i + j]));
 	return result;
 }
-vector<int> operator / (vector<int> a, vector<int> b) {
+vector<int> operator / (vector<int> a, vector<int> b) {		//деление полиномов (целая часть)
 	vector<int> res_polynom{};
 	res_polynom.assign(a.size() - b.size() + 1, 0);
 	while (a.size() >= b.size()) {
 		a = cut(a); //detele old zeros!
-		if (a.empty())break;
-		int old = a.size() - b.size(); //degree of monom
-		if (old < 0)break;
-		int mon = L(A(a.back()) / A(b.back())); //coefficient of monom ///2(a^1)
+		if (a.empty())break;	//если а был равен нулю - выход
+		int old = a.size() - b.size(); //степень монома результирующего полинома
+		if (old < 0)break;		//степень монома меньше нуля? выход!
+		int mon = L(A(a.back()) / A(b.back()));	//коэффициент монома
 		vector<int> monom{};
-		monom.assign(old, 0);//if(!old)
-		monom.push_back(mon);//monom[old] = mon;
+		monom.assign(old, 0);
+		monom.push_back(mon);
 		res_polynom[old] = mon;
-		vector<int> btw = b * monom;//7*2(a^(6+1)=a^0=1)
-		a = a + btw;//a=1 =>1+1=0
+		vector<int> btw = b * monom;
+		a = a + btw;
 	}
 	return res_polynom;
 }
-vector<int> operator % (vector<int> a, vector<int> b) {
+vector<int> operator % (vector<int> a, vector<int> b) {		//деление полиномов (остаток)
 	vector<int> remain = a;
 	while (remain.size() >= b.size()) {
 		remain = cut(remain); //detele old zeros!
@@ -116,31 +114,31 @@ vector<int> operator % (vector<int> a, vector<int> b) {
 	}
 	return remain;
 }
-vector <int> shift_n_zeros_to(vector<int>a, int n) {
+vector <int> shift_n_zeros_to(vector<int>a, int n) {	//умножить полином на х^n
 	vector<int> result{};
 	result.assign(n, 0);
 	for (int i = 0; i < a.size(); i++)result.push_back(a[i]);
 	return result;
 }
-vector<int> return_OM() {
+vector<int> return_OM() {				//вычисление ОМ
 	vector<int> OM{ b+1, 1 };
 	for (int i = b+1; i < dmin - 1; i++)OM = OM * vector<int>{i + 1, 1};
 	return OM;
 }
-vector<bool> A(int num) {//returns GF element alpha**(num-1)
-	if (num)
+vector<bool> A(int num) {				//сопоставляет числу двоичный вектор из GF
+	if (num)					//если число не нуль - возврат альфа в степени (число-1)
 		return gf[num - 1];
-	else {
+	else {						//иначе - возврат нулевого вектора
 		vector<bool>zero{};
 		zero.assign(m, 0);
 		return zero;
 	}
 }
-int L(vector<bool> v) { //returns number of GF (or log(alpha)+1) element
+int L(vector<bool> v) { 				//сопоставляет двоичному вектору из gf число (функция, обратная A())
 	for (int i = 0; i < n; i++)if (v == gf[i]) return i + 1;
 	return 0; //NULL
 }
-int Fx(vector<int> f, int x) { //где X - число, а не степень альфа.
+int Fx(vector<int> f, int x) { //где X - число, а не степень альфа. подставляет элемент GF в полином f
 	int siz = f.size();
 	vector<bool> result = A(f[0]);
 	for (int i = 1; i < siz; i++) {
@@ -148,10 +146,10 @@ int Fx(vector<int> f, int x) { //где X - число, а не степень �
 	}
 	return L(result);
 }
-vector<bool> pow_gf (int a, int power) {
+vector<bool> pow_gf (int a, int power) {		//возводит число-элемент GF a в степень power
 	return A(in_GF_range((a - 1)*power) + 1);
 }
-vector<int> return_syndroms(vector<int> code) {
+vector<int> return_syndroms(vector<int> code) {		//возвращает синдромный полином на основе принятого полиномиального кода
 	vector<int> result{ 1 };
 	int checkbit = 0;
 	int temp;
@@ -163,7 +161,7 @@ vector<int> return_syndroms(vector<int> code) {
 	result.push_back(checkbit);
 	return result;
 }
-vector<int> return_Z(vector<int>S, vector<int> C) {
+vector<int> return_Z(vector<int>S, vector<int> C) {	//полином Z для альтернативного алг. Форни (вход - синдромы и локаторы ошибок)
 	vector<int> result{ 1 };
 	vector<bool> temp;
 	int size = C.size();
@@ -176,18 +174,17 @@ vector<int> return_Z(vector<int>S, vector<int> C) {
 	}
 	return result;
 }
-vector<int> BMA(vector<int> S) {
-	//this is the decoder bma:
-	vector<int>		Cix{ 1 },		//sigma
-						Px{ 0, 1 };	//corrector
-	vector<bool>		sum;
-	vector<int>		dv, Cix_new;
-	int					d, l = 0, i = 1;
+vector<int> BMA(vector<int> S) {		//алгоритм БМ
+	vector<int>	Cix{ 1 },		//sigma
+			Px{ 0, 1 };	//corrector
+	vector<bool>	sum;
+	vector<int>	dv, Cix_new;
+	int		d, l = 0, i = 1;
 	{
 		while (1) {
-			sum = A(0);
-			for (int j = 1; j <= l; j++)sum = sum ^ (A(Cix[j]) * A(S[i - j]));
-			d = L(A(S[i]) ^ sum);
+			sum = A(0); //двоичный вектор нуля (вернет 0000 для m=4)
+			for (int j = 1; j <= l; j++)sum = sum ^ (A(Cix[j]) * A(S[i - j]));	// вычисление d
+			d = L(A(S[i]) ^ sum);							//
 			if (d) {
 				dv = { d };
 				Cix_new = Cix + dv * Px;
@@ -215,9 +212,9 @@ vector<int> BMA(vector<int> S) {
 	}
 	return Cix;
 }
-vector<int> CHEN(vector<int> C) {
+vector<int> CHEN(vector<int> C) {				//метод Ченя
 	vector<int>	locators{};
-	int				loc_at;
+	int		loc_at;
 	for (int j = 1; j < n + 1; j++) {
 		loc_at = Fx(C, j);
 		if (!loc_at) {
@@ -227,10 +224,10 @@ vector<int> CHEN(vector<int> C) {
 	}
 	return locators;
 }
-vector<int> FORNEY(vector<int>j, vector<int> Zx) {
-	int					jl, alpha, size = j.size();
-	vector<bool>		e1, e2, e3;
-	vector<int>		E; E.assign(n, 0);
+vector<int> FORNEY(vector<int>j, vector<int> Zx) {	//альтернативный алг. Форни
+	int		jl, alpha, size = j.size();
+	vector<bool>	e1, e2, e3;
+	vector<int>	E; E.assign(n, 0);
 	for (int l = 1; l < size + 1; l++) {
 		jl = j[l - 1];
 		alpha = in_GF_range(-jl) + 1;
